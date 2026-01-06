@@ -96,8 +96,7 @@ static void normalize_request_to_http_1_0(char *buffer, ssize_t *bytes_read)
             buffer[*bytes_read] = '\0';
         } 
         else {
-            fprintf(stderr,
-                    "[proxy] warning: no space to add Connection: close header\n");
+            fprintf(stderr, "[proxy] warning: no space to add Connection: close header\n");
         }
     }
 }
@@ -117,9 +116,7 @@ void *handle_connection(void *arg) {
     * часть заголовка. Поэтому читаем в цикле до \r\n\r\n или до заполнения буффера
     */
     while (1) {
-        ssize_t r = read(client_fd,
-                        buffer + bytes_read,
-                        sizeof(buffer) - 1 - bytes_read);
+        ssize_t r = read(client_fd, buffer + bytes_read, sizeof(buffer) - 1 - bytes_read);
         if (r < 0) {
             if (errno == EINTR) {
                 continue; // повторяем после прерывания
@@ -214,13 +211,8 @@ void *handle_connection(void *arg) {
 
     int gai = getaddrinfo(host, port_str, &hints, &res);
     if (gai != 0) {
-        (void)write(client_fd,
-                    RESP_502_RESOLVE_FAILED,
-                    strlen(RESP_502_RESOLVE_FAILED));
-        fprintf(stderr,
-                "[proxy] getaddrinfo(\"%s\") failed: %s\n",
-                host,
-                gai_strerror(gai));
+        (void)write(client_fd, RESP_502_RESOLVE_FAILED, strlen(RESP_502_RESOLVE_FAILED));
+        fprintf(stderr, "[proxy] getaddrinfo(\"%s\") failed: %s\n", host, gai_strerror(gai));
         close(client_fd);
         return NULL;
     }
@@ -238,17 +230,13 @@ void *handle_connection(void *arg) {
             void *addr_ptr = NULL;
             if (rp->ai_family == AF_INET) {
                 addr_ptr = &((struct sockaddr_in *)rp->ai_addr)->sin_addr;
-            } else if (rp->ai_family == AF_INET6) {
+            } 
+            else if (rp->ai_family == AF_INET6) {
                 addr_ptr = &((struct sockaddr_in6 *)rp->ai_addr)->sin6_addr;
             }
             if (addr_ptr) {
-                inet_ntop(rp->ai_family,
-                          addr_ptr,
-                          addr_str,
-                          sizeof(addr_str));
-                printf("[proxy] connecting to origin %s:%d\n",
-                       addr_str,
-                       ORIGIN_HTTP_PORT);
+                inet_ntop(rp->ai_family, addr_ptr, addr_str, sizeof(addr_str));
+                printf("[proxy] connecting to origin %s:%d\n", addr_str, ORIGIN_HTTP_PORT);
             }
             break;
         }
@@ -406,4 +394,3 @@ int main(int argc, char **argv) {
     close(server_fd);
     return 0;
 }
-
